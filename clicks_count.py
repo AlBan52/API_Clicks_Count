@@ -15,11 +15,11 @@ def parse_command_line():
 
 def shorten_link(long_url, headers):
     long_url_data = {"long_url": long_url}
-    service_chapter = 'shorten'
     response = requests.post(
-        f'https://api-ssl.bitly.com/v4/{service_chapter}',
+        f'https://api-ssl.bitly.com/v4/shorten',
         headers=headers,
-        json=long_url_data)
+        json=long_url_data
+    )
     response.raise_for_status()
     response_data = response.json()
     shorten_link = response_data.get('link')
@@ -30,8 +30,9 @@ def count_click(headers, bitlink):
     parts_of_bitlink = urllib.parse.urlsplit(bitlink)
     bitlink_for_response = f'{parts_of_bitlink.netloc}{parts_of_bitlink.path}'
     response = requests.get(
-        f'https://api-ssl.bitly.com/v4/bitlinks/{bitlink_for_response}/clicks/summary',
-        headers=headers)
+        f'https://api-ssl.bitly.com/v4/bitlinks/{bitlink_for_response}'
+        f'/clicks/summary', headers=headers
+    )
     response.raise_for_status()
     response_data = response.json()
     total_clicks = response_data.get('total_clicks')
@@ -39,12 +40,12 @@ def count_click(headers, bitlink):
 
 
 def check_link(headers, long_url):
-    service_chapter = 'bitlinks'
     parts_of_bitlink = urllib.parse.urlsplit(long_url)
     bitlink_for_response = f'{parts_of_bitlink.netloc}{parts_of_bitlink.path}'
     response = requests.get(
-        f'https://api-ssl.bitly.com/v4/{service_chapter}/{bitlink_for_response}',
-        headers=headers)
+        f'https://api-ssl.bitly.com/v4/bitlinks/{bitlink_for_response}',
+        headers=headers
+    )
     return response.ok
 
 
