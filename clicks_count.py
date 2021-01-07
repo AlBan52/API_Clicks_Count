@@ -14,11 +14,11 @@ def parse_command_line():
 
 
 def shorten_link(long_url, headers):
-    long_url_data = {"long_url": long_url}
+    payload = {'long_url': long_url}
     response = requests.post(
         f'https://api-ssl.bitly.com/v4/shorten',
         headers=headers,
-        json=long_url_data
+        json=payload
     )
     response.raise_for_status()
     response_data = response.json()
@@ -26,13 +26,11 @@ def shorten_link(long_url, headers):
     return shorten_link
 
 
-def count_click(headers, bitlink):
-    parts_of_bitlink = urllib.parse.urlsplit(bitlink)
-    bitlink_for_response = f'{parts_of_bitlink.netloc}{parts_of_bitlink.path}'
-    response = requests.get(
-        f'https://api-ssl.bitly.com/v4/bitlinks/{bitlink_for_response}'
-        f'/clicks/summary', headers=headers
-    )
+def count_click(headers, raw_bitlink):
+    parts_of_bitlink = urllib.parse.urlsplit(raw_bitlink)
+    bitlink = f'{parts_of_bitlink.netloc}{parts_of_bitlink.path}'
+    link = f'https://api-ssl.bitly.com/v4/bitlinks/{bitlink}/clicks/summary'
+    response = requests.get(link, headers=headers)
     response.raise_for_status()
     response_data = response.json()
     total_clicks = response_data.get('total_clicks')
@@ -41,9 +39,9 @@ def count_click(headers, bitlink):
 
 def check_link(headers, long_url):
     parts_of_bitlink = urllib.parse.urlsplit(long_url)
-    bitlink_for_response = f'{parts_of_bitlink.netloc}{parts_of_bitlink.path}'
+    bitlink = f'{parts_of_bitlink.netloc}{parts_of_bitlink.path}'
     response = requests.get(
-        f'https://api-ssl.bitly.com/v4/bitlinks/{bitlink_for_response}',
+        f'https://api-ssl.bitly.com/v4/bitlinks/{bitlink}',
         headers=headers
     )
     return response.ok
@@ -61,9 +59,10 @@ if __name__ == '__main__':
             print('Bitlinks clicks count : ', clicks_count)
         except requests.exceptions.HTTPError:
             print('Incorrect link inputed. Please restart script')
+#   add the exception block for possible mistake of shorten link input
     else:
         try:
-            bitlink = shorten_link(long_url, authorization)
-            print('Bitlink : ', bitlink)
+            raw_bitlink = shorten_link(long_url, authorization)
+            print('Bitlink : ', raw_bitlink)
         except requests.exceptions.HTTPError:
             print('Incorrect link inputed. Please restart script')
