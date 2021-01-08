@@ -59,7 +59,7 @@ if __name__ == '__main__':
             print('Bitlinks clicks count : ', clicks_count)
         except requests.exceptions.HTTPError:
             print('Incorrect link inputed. Please restart script')
-#   add the exception block for possible mistake of shorten link input
+    #   add the exception block for possible mistake of shorten link input
     else:
         try:
             raw_bitlink = shorten_link(long_url, authorization)
